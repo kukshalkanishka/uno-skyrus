@@ -64,70 +64,100 @@ const joinGame = function(req, res) {
 
 //ADD ARTIFICIAL INTELLIGENCE ---------------------
 const addAiEasy = function(req, res) {
-	const {gameKey, id } = req.cookies;
-	const game = req.app.games.getGame(gameKey);
+  const { gameKey, id } = req.cookies;
+  const game = req.app.games.getGame(gameKey);
 
-	//Get player names for the ai-id
+  //Get player names for the ai-id
   const players = game.getPlayers().getPlayers();
-	const playersNames = players.map(player => player.getName());
+  const playersNames = players.map(player => player.getName());
 
-	const aiID = generateGameKey();
+  const aiID = generateGameKey();
 
-	const aiNames = ["Sarah-Computer", "Jack-Computer", "Paul-Computer", "Olivia-Computer", "Lily-Computer", "Daniel-Computer", "Martin-Computer", "Matthew-Computer", "Adam-Computer", "David-Computer"];
-	const ai = new EasyAi(aiNames[Math.floor(Math.random() * 10)], aiID, game);
-	game.addPlayer(ai);
-	res.send({playersCount: game.getPlayersCount(), playersJoined: game.getPlayers().getPlayersCount()});
+  const aiNames = [
+    'Sarah-Computer',
+    'Jack-Computer',
+    'Paul-Computer',
+    'Olivia-Computer',
+    'Lily-Computer',
+    'Daniel-Computer',
+    'Martin-Computer',
+    'Matthew-Computer',
+    'Adam-Computer',
+    'David-Computer'
+  ];
+  const ai = new EasyAi(aiNames[Math.floor(Math.random() * 10)], aiID, game);
+  game.addPlayer(ai);
+  res.send({
+    playersCount: game.getPlayersCount(),
+    playersJoined: game.getPlayers().getPlayersCount()
+  });
 };
 
 const addAiHard = function(req, res) {
-	const {gameKey, id } = req.cookies;
-	const game = req.app.games.getGame(gameKey);
+  const { gameKey, id } = req.cookies;
+  const game = req.app.games.getGame(gameKey);
 
-	//Get player names for the ai-id
-	const extractPlayersNames = function(game) {
+  //Get player names for the ai-id
+  const extractPlayersNames = function(game) {
     const players = game.getPlayers().getPlayers();
     return players.map(player => player.getName());
   };
   const playersNames = extractPlayersNames(game);
-	const aiID = generateGameKey();
+  const aiID = generateGameKey();
 
-	const aiNames = ["Sarah-Computer", "Jack-Computer", "Paul-Computer", "Olivia-Computer", "Lily-Computer", "Daniel-Computer", "Martin-Computer", "Matthew-Computer", "Adam-Computer", "David-Computer"];
-	const ai = new HardAi(aiNames[Math.floor(Math.random() * 10)], aiID, game);
-	game.addPlayer(ai);
-	res.send({playersCount: game.getPlayersCount(), playersJoined: game.getPlayers().getPlayersCount()});
+  const aiNames = [
+    'Sarah-Computer',
+    'Jack-Computer',
+    'Paul-Computer',
+    'Olivia-Computer',
+    'Lily-Computer',
+    'Daniel-Computer',
+    'Martin-Computer',
+    'Matthew-Computer',
+    'Adam-Computer',
+    'David-Computer'
+  ];
+  const ai = new HardAi(aiNames[Math.floor(Math.random() * 10)], aiID, game);
+  game.addPlayer(ai);
+  res.send({
+    playersCount: game.getPlayersCount(),
+    playersJoined: game.getPlayers().getPlayersCount()
+  });
 };
 
 const removeAi = function(req, res) {
-	const { gameKey, id } = req.cookies;
+  const { gameKey, id } = req.cookies;
   const game = res.app.games.getGame(gameKey);
-	const players = game.getPlayers().getPlayers();
-	var i;
-	for(i = players.length-1; i != 0; i--){
-		if(players[i].getName().length > 10){
-			game.leaveGame(players[i].getId());
-			break;
-		}
-	}
-	res.send(players[i].getName() + " named ai has removed");
-	res.end();
+  const players = game.getPlayers().getPlayers();
+  var i;
+  for (i = players.length - 1; i != 0; i--) {
+    if (players[i].getName().length > 10) {
+      game.leaveGame(players[i].getId());
+      break;
+    }
+  }
+  res.send(players[i].getName() + ' named ai has removed');
+  res.end();
 };
 
-const aiListener = function(req, res){
+const aiListener = function(req, res) {
   const { gameKey, id } = req.cookies;
   const game = req.app.games.getGame(gameKey);
   const players = game.getPlayers().getPlayers();
 
-  for(var i = 0; i < players.length; i++){
-    if(players[i].getName().length > 10 && game.getPlayers().isCurrent(players[i])){
-			const ai = players[i];
-			ai.move();
+  for (var i = 0; i < players.length; i++) {
+    if (
+      players[i].getName().length > 10 &&
+      game.getPlayers().isCurrent(players[i])
+    ) {
+      const ai = players[i];
+      ai.move();
     }
   }
 
-	res.end();
+  res.end();
 };
 //------------------------------------------------
-
 
 const servePlayerCards = function(req, res) {
   const { gameKey, id } = req.cookies;
@@ -136,9 +166,9 @@ const servePlayerCards = function(req, res) {
   const player = game.getPlayers().getPlayer(id);
   let playableCards = [];
 
-	//GETTING SCORE -------
-	const score = player.calculateScore();
-	// --------------------
+  //GETTING SCORE -------
+  const score = player.calculateScore();
+  // --------------------
 
   if (
     game
@@ -151,8 +181,8 @@ const servePlayerCards = function(req, res) {
   res.send({
     cards,
     playableCards,
-		//ADDED PLAYER SCORE ---------
-		score
+    //ADDED PLAYER SCORE ---------
+    score
   });
 };
 
@@ -238,11 +268,11 @@ const getPlayerNames = (req, res) => {
       name: player.name,
       isCurrent: game.getPlayers().isCurrent(player),
       cardsCount: player.getCardsCount(),
-			//ADDED and STATISTICS--------
-			score: player.calculateScore(),
-			maxCard: player.getMaxCard(player.getCardsCount()),
-			thrownCards: player.getThrownCards()
-			//----------------------------------
+      //ADDED and STATISTICS--------
+      score: player.calculateScore(),
+      maxCard: player.getMaxCard(player.getCardsCount()),
+      thrownCards: player.getThrownCards()
+      //----------------------------------
     };
   });
 
@@ -405,37 +435,39 @@ const updateRunningColor = function(req, res) {
 
 // OUR REQUESTS -------------------------------------------
 
-const addChat = function(req, res){
-	const { gameKey, id } = req.cookies;
-    const game = req.app.games.getGame(gameKey);
+const addChat = function(req, res) {
+  const { gameKey, id } = req.cookies;
+  const game = req.app.games.getGame(gameKey);
 
-	//Getting the objects
-	const array = game.getChat();
-	var message = req.body;
+  //Getting the objects
+  const array = game.getChat();
+  var message = req.body;
 
-	const players = game.getPlayers().getPlayers();
-	const playerPosition = players.findIndex(player => player.id == id);
-	const playerDetails = players.map(player => {
-      return {
-        name: player.name,
-        isCurrent: game.getPlayers().isCurrent(player),
-        cardsCount: player.getCardsCount()
-      };
-    });
+  const players = game.getPlayers().getPlayers();
+  const playerPosition = players.findIndex(player => player.id == id);
+  const playerDetails = players.map(player => {
+    return {
+      name: player.name,
+      isCurrent: game.getPlayers().isCurrent(player),
+      cardsCount: player.getCardsCount()
+    };
+  });
 
-	array.push({from: playerDetails[playerPosition].name, msg: message.text, color: playerPosition});
-	game.setChat(array);
-	res.send(game.getChat());
+  array.push({
+    from: playerDetails[playerPosition].name,
+    msg: message.text,
+    color: playerPosition
+  });
+  game.setChat(array);
+  res.send(game.getChat());
 };
 
 const serveChat = function(req, res) {
-	const { gameKey } = req.cookies;
-    const game = req.app.games.getGame(gameKey);
-	const chat = JSON.stringify(game.getChat());
-	res.send(chat);
+  const { gameKey } = req.cookies;
+  const game = req.app.games.getGame(gameKey);
+  const chat = JSON.stringify(game.getChat());
+  res.send(chat);
 };
-
-
 
 //---------------------------------------------------------
 
@@ -461,10 +493,10 @@ module.exports = {
   updateRunningColor,
   addChat,
   serveChat,
-	//ARTIFICIAL INTELLIGENCE--------------------------
-	addAiEasy,
-	addAiHard,
-	removeAi,
+  //ARTIFICIAL INTELLIGENCE--------------------------
+  addAiEasy,
+  addAiHard,
+  removeAi,
   aiListener
-//-------------------------------------------------
+  //-------------------------------------------------
 };
