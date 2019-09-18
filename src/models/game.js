@@ -41,18 +41,18 @@ class Game {
     this.hasDrawnTwo = true;
     this.hasDrawnFour = true;
 
-	//STRING ARRAY FORM MESSAGES -----------------------------
-	this.chat = [];
-	//--------------------------------------------------------
+    //STRING ARRAY FORM MESSAGES -----------------------------
+    this.chat = [];
+    //--------------------------------------------------------
   }
 
   //CHAT METHODS ---------------------------------------------
-  getChat(){
-	return this.chat;
+  getChat() {
+    return this.chat;
   }
 
-  setChat(newchat){
-	this.chat = newchat;
+  setChat(newchat) {
+    this.chat = newchat;
   }
   //----------------------------------------------------------
 
@@ -77,14 +77,14 @@ class Game {
     return this.players;
   }
 
-	//ARTIFICIAL INTELLIGENCE --------------------------------
+  //ARTIFICIAL INTELLIGENCE --------------------------------
 
-	aiThrowCard(aiID, card, unoCallStatus){
+  aiThrowCard(aiID, card, unoCallStatus) {
     const ai = this.players.getPlayer(aiID);
-		this.runningColor = card.color;
-		const aiName = ai.getName();
+    this.runningColor = card.color;
+    const aiName = ai.getName();
 
-		if (card.isDrawTwo) {
+    if (card.isDrawTwo) {
       const gain = increaseGain(this.cardsToDraw);
       this.hasDrawnTwo = false;
       this.cardsToDraw = this.cardsToDraw + gain;
@@ -95,66 +95,63 @@ class Game {
       this.cardsToDraw = 4;
     }
 
+    ai.resetHasCaught();
+    ai.removeCard(card);
+    this.pile.push(card);
+    ai.setUnoCall(unoCallStatus);
+    this.activityLog.logThrowCard(aiName, card);
+    if (ai.getUnoCallStatus()) {
+      this.activityLog.logCallUno(aiName);
+    }
 
-		ai.resetHasCaught();
-		ai.removeCard(card);
-		this.pile.push(card);
-		ai.setUnoCall(unoCallStatus);
-		this.activityLog.logThrowCard(aiName, card);
-		if(ai.getUnoCallStatus()){
-			this.activityLog.logCallUno(aiName);
-		}
+    this.updatePlayer(card);
+  }
 
-		this.updatePlayer(card);
-	}
-
-	aiDrawCards(aiID) {
+  aiDrawCards(aiID) {
     const ai = this.players.getPlayer(aiID);
-		const aiName = ai.getName();
-		const drawnCards = this.stack.splice(-this.cardsToDraw);
+    const aiName = ai.getName();
+    const drawnCards = this.stack.splice(-this.cardsToDraw);
 
-		ai.resetHasCaught();
-		ai.resetUnoCall();
-		ai.addCards(drawnCards);
-		ai.setDrawCardStatus(false);
+    ai.resetHasCaught();
+    ai.resetUnoCall();
+    ai.addCards(drawnCards);
+    ai.setDrawCardStatus(false);
 
-		ai.setPlayableCards([]);
-		this.activityLog.logDrawCards(aiName, drawnCards.length);
+    ai.setPlayableCards([]);
+    this.activityLog.logDrawCards(aiName, drawnCards.length);
 
-		if(this.cardsToDraw != 1) {
-			this.cardsToDraw = 1;
-			this.hasDrawnTwo = true;
-			this.hasDrawnFour = true;
-			this.getPlayers().changeTurn();
-			this.updatePlayableCards();
-			return [];
-		}
+    if (this.cardsToDraw != 1) {
+      this.cardsToDraw = 1;
+      this.hasDrawnTwo = true;
+      this.hasDrawnFour = true;
+      this.getPlayers().changeTurn();
+      this.updatePlayableCards();
+      return [];
+    }
 
-		const playableCards = ai.getPlayableCards();
-		const normalPlayableCards = playableCards.filter(card => !card.isDrawFour);
+    const playableCards = ai.getPlayableCards();
+    const normalPlayableCards = playableCards.filter(card => !card.isDrawFour);
     const hasNoNormalPlayableCards = normalPlayableCards.length === 0;
 
-		const isPlayable = drawnCards[0].canPlayOnTopOf(
-			this.getTopDiscard(),
+    const isPlayable = drawnCards[0].canPlayOnTopOf(
+      this.getTopDiscard(),
       this.runningColor,
       this.hasDrawnTwo,
       this.hasDrawnFour,
       hasNoNormalPlayableCards
-		);
+    );
 
-		if(isPlayable){
-			ai.setPlayableCards(drawnCards);
+    if (isPlayable) {
+      ai.setPlayableCards(drawnCards);
       return drawnCards;
-		}
+    }
 
-		this.getPlayers().changeTurn();
+    this.getPlayers().changeTurn();
     this.updatePlayableCards();
     return [];
+  }
 
-	}
-
-	//--------------------------------------------------------
-
+  //--------------------------------------------------------
 
   throwCard(playerId, id, unoCallStatus) {
     const player = this.players.getPlayer(playerId);
@@ -202,10 +199,10 @@ class Game {
 
     this.updatePlayer(thrownCard);
 
-		//LEADER BOARD STATISTICS --------------------
-		player.increaseThrownCard();
-		player.calculateScore();
-		// -------------------------------------------
+    //LEADER BOARD STATISTICS --------------------
+    player.increaseThrownCard();
+    player.calculateScore();
+    // -------------------------------------------
   }
 
   updatePlayer(thrownCard) {
@@ -309,9 +306,9 @@ class Game {
     this.getPlayers().changeTurn();
     this.updatePlayableCards();
 
-		//CALCULATE THE SCORE ------------------
-		currentPlayer.calculateScore();
-		// -------------------------------------
+    //CALCULATE THE SCORE ------------------
+    currentPlayer.calculateScore();
+    // -------------------------------------
 
     return [];
   }
